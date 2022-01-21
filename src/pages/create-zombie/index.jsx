@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import sha256 from "sha256";
 import leftfeet from "../../zombieparts/left-feet-1@2x.png";
@@ -17,6 +17,8 @@ import hand1 from "../../zombieparts/hand1-1@2x.png";
 import hand2 from "../../zombieparts/hand-2-1@2x.png";
 import mouth from "../../zombieparts/mouth-1@2x.png";
 import catleg from "../../zombieparts/catlegs.png";
+import sha3 from "js-sha3";
+import bigInt from "big-integer";
 
 CreateZombie.propTypes = {};
 
@@ -48,10 +50,13 @@ function CreateZombie(props) {
   //     setNft({ ...nft, image: avatar });
   //   }
   // };
-  const [currentSkin, setCurrentSkin] = useState(0);
+  const [currentHead, setCurrentHead] = useState(1);
+  const [currentSkinColor, setCurrentSkinColor] = useState(0);
   const [currentEye, setCurrentEye] = useState(1);
-  const [currentClothes, setCurrentClothes] = useState(2);
-  const [catMode, setCatMode] = useState(true)
+  const [currentEyeColor, setCurrentEyeColor] = useState(1);
+  const [currentClothes, setCurrentClothes] = useState(1);
+  const [currentClothesColor, setCurrentClothesColor] = useState(2);
+  const [catMode, setCatMode] = useState(true);
   const shirtClass = (i) => {
     return `shirt shirt-part-${i}`;
   };
@@ -74,7 +79,7 @@ function CreateZombie(props) {
     return { filter: `hue-rotate(${def}deg)` };
   };
   // const headColor = () => {
-    
+
   //   return getColor(currentSkin);
   // };
   // console.log(getColor(currentSkin))
@@ -87,131 +92,162 @@ function CreateZombie(props) {
   const shirt = () => {
     let shirts = [];
     for (var i = 1; i <= 6; i++) {
-      shirts.push(<img style={getColor(currentClothes)} className={`${shirtClass(i)} ${i == currentClothes + 1 ? "block" : "hidden"}`} src={shirtSrc(i)} key={i}/>);
+      shirts.push(
+        <img
+          style={getColor(currentClothes)}
+          className={`${shirtClass(i)} ${
+            i == currentClothes ? "block" : "hidden"
+          }`}
+          src={shirtSrc(i)}
+          key={i}
+        />
+      );
     }
     return shirts;
   };
   const head = () => {
     let heads = [];
-    for (var i = 1; i <= 6; i++) {
-      heads.push(<img style={getColor(currentSkin)} className={`${headClass(i)} ${i == currentSkin + 1 ? "block" : "hidden"}`} src={headSrc(i)}/>);
+    for (var i = 1; i <= 7; i++) {
+      heads.push(
+        <img
+          style={getColor(currentSkinColor)}
+          className={`${headClass(i)} ${
+            i == currentHead ? "block" : "hidden"
+          }`}
+          src={headSrc(i)}
+        />
+      );
     }
     return heads;
   };
   const eye = () => {
     let eyes = [];
-    for (var i = 1; i <= 6; i++) {
-      eyes.push(<img style={getColor(currentEye)} className={`${eyeClass(i)} ${i == currentEye + 1 ? "block" : "hidden"}`} src={eyeSrc(i)} />);
+    for (var i = 1; i <= 11; i++) {
+      eyes.push(
+        <img
+          style={getColor(currentEye)}
+          className={`${eyeClass(i)} ${
+            i == currentEye  ? "block" : "hidden"
+          }`}
+          src={eyeSrc(i)}
+        />
+      );
     }
     return eyes;
   };
-
-
+  const randomZombie = () => {
+    const rad = Math.random(0, 1);
+    const hash = sha3.keccak256(rad.toString());
+    const bigInteger = bigInt(hash, 16);
+    const dna = String(bigInteger.mod(Math.pow(10, 16)))
+    console.log((parseInt(dna.substring(0, 2)) % 7) + 1)
+    setCurrentHead((parseInt(dna.substring(0, 2)) % 7) + 1);
+    setCurrentEye((parseInt(dna.substring(2, 4)) % 11) + 1);
+    setCurrentClothes((parseInt(dna.substring(4, 6)) % 6) + 1);
+    setCurrentSkinColor((parseInt(dna.substring(6, 8)) / 100) * 360);
+    setCurrentEyeColor((parseInt(dna.substring(8, 10)) / 100) * 360);
+    setCurrentClothesColor((parseInt(dna.substring(10, 12)) / 100) * 360);
+  };
   return (
-    <div className={`zombie-char zombie-parts`}>
+   <div className="flex justify-center flex-col items-center mt-20">
+      <div className={`zombie-char zombie-parts h-96 w-96 mr-16`}>
       <img
-        style={getColor(currentClothes)}
+        style={getColor(currentClothesColor)}
         className={`left-feet ${catMode ? "hidden" : ""}`}
         src={leftfeet}
       />
       <img
-        style={getColor(currentClothes)}
+        style={getColor(currentClothesColor)}
         // v-show="!catMode"
         className={`right-feet ${catMode ? "hidden" : ""}`}
         src={rightfeet}
       />
 
       <img
-        style={getColor(currentClothes)}
+        style={getColor(currentClothesColor)}
         // v-show="!catMode"
         className={`left-leg ${catMode ? "hidden" : ""}`}
         src={leftleg}
       />
       <img
-        style={getColor(currentClothes)}
+        style={getColor(currentClothesColor)}
         // v-show="!catMode"
         className={`right-leg ${catMode ? "hidden" : ""}`}
         src={rightleg}
       />
 
       <img
-        style={getColor(currentClothes)}
+        style={getColor(currentClothesColor)}
         // v-show="!catMode"
         className={`left-thigh ${catMode ? "hidden" : ""}`}
         src={leftthigh}
       />
       <img
-       style={getColor(currentClothes)}
+        style={getColor(currentClothesColor)}
         // v-show="!catMode"
         className={`right-thigh ${catMode ? "hidden" : ""}`}
         src={rightthigh}
       />
 
       <img
-        style={getColor(currentSkin)}
+        style={getColor(currentSkinColor)}
         className="left-forearm"
         src={leftforearm}
       />
       <img
-        style={getColor(currentSkin)}
+        style={getColor(currentSkinColor)}
         className="right-forearm"
         src={rightforearm}
       />
 
       <img
-         style={getColor(currentSkin)}
+        style={getColor(currentSkinColor)}
         className="right-upper-arm"
         src={rightupperarm}
       />
 
       <img
-        style={getColor(currentClothes)}
+        style={getColor(currentClothesColor)}
         className="torso"
         src={torso}
       />
 
       <img
-        style={getColor(currentClothes)}
+        style={getColor(currentClothesColor)}
         // v-show="catMode"
         className={`cat-legs ${catMode ? "block" : "hidden"}`}
         src={catleg}
       />
-      {
-      shirt()
-    }
+      {shirt()}
       <img
-        style={getColor(currentSkin)}
+        style={getColor(currentSkinColor)}
         className="left-upper-arm"
         src={leftupperarm}
       />
 
       <img
-        style={getColor(currentSkin)}
+        style={getColor(currentSkinColor)}
         className="left-forearm"
         src={leftforearm}
       />
       <img
-        style={getColor(currentSkin)}
+        style={getColor(currentSkinColor)}
         className="right-forearm"
         src={rightforearm}
       />
 
       <img
-        style={getColor(currentSkin)}
+        style={getColor(currentSkinColor)}
         className="left-hand"
         src={hand1}
       />
       <img
-        style={getColor(currentSkin)}
+        style={getColor(currentSkinColor)}
         className="right-hand"
         src={hand2}
       />
-      {
-      head()
-    }
-      {
-      eye()
-    }
+      {head()}
+      {eye()}
       {/* <img style="headColor" :className="headClass(n)" v-for="(n,i) in 7" :src="headSrc(n)" :key="i"> */}
       {/* <img style="eyeColor" :className="eyeClass(n)" v-for="(n,i) in 11" :src="eyeSrc(n)" :key="i"> */}
       <img className="mouth" src={mouth} />
@@ -222,7 +258,15 @@ function CreateZombie(props) {
     </div>
     <small>Description</small>
   </div> */}
+    
     </div>
+    <button
+        className="bg-cyan-500 shadow-lg shadow-cyan-500/50 text-white font-bold py-2 px-4 rounded"
+        onClick={randomZombie}
+      >
+        Claim zombie
+      </button>
+   </div>
   );
 }
 // <div className="flex items-center justify-center h-screen my-12">

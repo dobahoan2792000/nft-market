@@ -23,8 +23,7 @@
   .zombie-parts {
     position: relative;
     margin-left: -2vh;
-    margin-top: 31vh;
-    
+      
   }
   .zombie-parts .head {
     width: 28vh;
